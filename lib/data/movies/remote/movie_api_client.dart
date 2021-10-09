@@ -10,7 +10,7 @@ import 'model/movie_detail_response.dart';
 
 const String BASE_URL = 'https://api.themoviedb.org/3';
 const String IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
-const String API_KEY = '526125b47288763c4b687f30f7193509';
+const String API_KEY = '1c9c2eff5a191a07fd908ec1dd2c1c12';
 const String LANGUAGE = 'en-US';
 
 class MovieApiClient {
@@ -59,8 +59,13 @@ class MovieApiClient {
     List<MovieItemResponse>? movies;
 
     try {
-      Response response = await _dio
-          .get('/movie/now_playing?api_key=$API_KEY&language=$LANGUAGE');
+      Response response = await _dio.get(
+        '/movie/now_playing',
+        queryParameters: {
+          'api_key': API_KEY,
+          'language': LANGUAGE,
+        },
+      );
 
       ListResponse<MovieItemResponse> moviesResponse =
           ListResponse<MovieItemResponse>.fromJson(

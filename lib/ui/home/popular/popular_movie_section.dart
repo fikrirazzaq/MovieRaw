@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:movies_starter_app/data/movies/model/movie_item_response.dart';
-import 'package:movies_starter_app/data/movies/movie_api_client.dart';
-import 'package:movies_starter_app/ui/_reusable/movie_horizontal_listview_widget.dart';
-import 'package:movies_starter_app/ui/popular_movies/popular_movies_screen.dart';
+
+import '../../../data/movies/model/movie_item_response.dart';
+import '../../../data/movies/movie_api_client.dart';
+import '../../popular_movies/popular_movies_screen.dart';
+import 'popular_movie_horizontal_listview_widget.dart';
 
 class PopularMoviesSectionWidget extends StatefulWidget {
   const PopularMoviesSectionWidget({Key? key}) : super(key: key);
@@ -29,7 +30,16 @@ class _PopularMoviesSectionWidgetState
               children: [
                 Row(
                   children: [
-                    Expanded(child: Text('Popular')),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        'Popular Today',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                     TextButton(
                       onPressed: () {
                         Navigator.pushNamed(
@@ -39,9 +49,7 @@ class _PopularMoviesSectionWidgetState
                     ),
                   ],
                 ),
-                MovieHorizontalListViewWidget(
-                  movieItems: movies,
-                ),
+                PopularMovieHorizontalListViewWidget(movieItems: movies),
               ],
             );
           } else {

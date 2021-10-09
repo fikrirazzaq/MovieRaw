@@ -2,23 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:movies_starter_app/data/movies/model/movie_item_response.dart';
 import 'package:movies_starter_app/ui/movie_detail/movie_detail_screen.dart';
 
-import 'movie_horizontal_listitem_widget.dart';
+import 'popular_movie_horizontal_listitem_widget.dart';
 
-class MovieHorizontalListViewWidget extends StatelessWidget {
+class PopularMovieHorizontalListViewWidget extends StatelessWidget {
   final List<MovieItemResponse> movieItems;
-  const MovieHorizontalListViewWidget({Key? key, required this.movieItems})
+  const PopularMovieHorizontalListViewWidget({Key? key, required this.movieItems})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 264,
-      child: ListView.builder(
+      height: 190,
+      child: ListView.separated(
         scrollDirection: Axis.horizontal,
+        separatorBuilder: (context, index) => SizedBox(width: 6),
         physics: BouncingScrollPhysics(),
+        padding: EdgeInsets.symmetric(horizontal: 12),
         itemCount: 6,
         itemBuilder: (context, index) {
-          return MovieHorizontalListItemWidget(
+          return PopularMovieHorizontalListItemWidget(
             movieItemResponse: movieItems[index],
             onTap: () {
               Navigator.pushNamed(
