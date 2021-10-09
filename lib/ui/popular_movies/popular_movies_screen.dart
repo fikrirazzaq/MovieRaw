@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:movies_starter_app/data/movies/model/movie_item_response.dart';
-import 'package:movies_starter_app/data/movies/movie_api_client.dart';
+import 'package:movies_starter_app/data/movies/remote/movie_api_client.dart';
+import 'package:movies_starter_app/ui/_model/movie_item.dart';
+import 'package:movies_starter_app/ui/_reusable/movie_gridview_widget.dart';
 import 'package:movies_starter_app/ui/movie_detail/movie_detail_screen.dart';
 
 class PopularMoviesScreen extends StatefulWidget {
@@ -23,25 +25,11 @@ class _PopularMoviesScreenState extends State<PopularMoviesScreen> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  MovieItemResponse movie = snapshot.data![index];
-                  return ListTile(
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        MovieDetailScreen.routeName,
-                        arguments: MovieDetailArguments(
-                          movieId: movie.id ?? 0,
-                          movieName: movie.title ?? '',
-                        ),
-                      );
-                    },
-                    title: Text('${movie.title}'),
-                  );
-                },
-              );
+              List<MovieItemResponse> movies = snapshot.data!;
+              return MovieGridViewWidget(
+                  movie: movies
+                      .map((e) => MovieItem.fromMovieItemResponse(e))
+                      .toList());
             } else {
               return Text('Empty');
             }

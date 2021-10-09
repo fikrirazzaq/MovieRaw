@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'components/now_playing_movie_section.dart';
-import 'components/popular_movie_section.dart';
+import 'now_playing/now_playing_movie_section.dart';
+import 'popular/popular_movie_section.dart';
 
 class HomeBody extends StatelessWidget {
   const HomeBody({Key? key}) : super(key: key);
@@ -9,9 +9,12 @@ class HomeBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      padding: EdgeInsets.symmetric(vertical: 16),
+      physics: BouncingScrollPhysics(),
       children: [
-        NowPlayingMoviesSectionWidget(),
         PopularMoviesSectionWidget(),
+        SizedBox(height: 16),
+        NowPlayingMoviesSectionWidget(),
       ],
     );
   }

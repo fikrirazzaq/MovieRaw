@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../data/movies/model/movie_item_response.dart';
-import '../../../data/movies/movie_api_client.dart';
+import '../../../data/movies/remote/movie_api_client.dart';
 import '../../popular_movies/popular_movies_screen.dart';
-import 'popular_movie_horizontal_listview_widget.dart';
+import 'popular_movie_listview_widget.dart';
 
 class PopularMoviesSectionWidget extends StatefulWidget {
   const PopularMoviesSectionWidget({Key? key}) : super(key: key);
@@ -49,7 +49,7 @@ class _PopularMoviesSectionWidgetState
                     ),
                   ],
                 ),
-                PopularMovieHorizontalListViewWidget(movieItems: movies),
+                PopularMovieListViewWidget(movieItems: movies),
               ],
             );
           } else {

@@ -9,17 +9,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, LoginScreen.routeName);
-            },
-            icon: Icon(Icons.login),
-          ),
-        ],
-      ),
-      body: HomeBody(),
+      body: SafeArea(child: HomeBody()),
     );
   }
 }

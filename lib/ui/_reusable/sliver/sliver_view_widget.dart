@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:sanf/presentation/reusable/sliver/collapsing_app_bar.dart';
-import 'package:sanf/presentation/reusable/sliver/sliver_body.dart';
+
+import 'collapsing_app_bar.dart';
+import 'sliver_body.dart';
 
 class SliverViewWidget extends StatefulWidget {
   final Widget body;
   final String title;
   final String imageUrl;
+  final VoidCallback onFavoritePressed;
+  final bool isFavorite;
 
   const SliverViewWidget({
     Key? key,
     required this.body,
     required this.title,
     required this.imageUrl,
+    this.isFavorite = false,
+    required this.onFavoritePressed,
   }) : super(key: key);
 
   @override
@@ -47,6 +52,8 @@ class _SliverViewWidgetState extends State<SliverViewWidget> {
           paddingTopOfTitle: _paddingTopOfTitle,
           scrollDistance: _scrollDistance,
           collapsingAppBarNotifier: _collapsingAppBarNotifier,
+          onFavoritePressed: widget.onFavoritePressed,
+          isFavorite: widget.isFavorite,
         ),
         SliverBody(
           child: widget.body,

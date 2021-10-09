@@ -6,7 +6,7 @@ import 'package:movies_starter_app/data/dio_logging.dart';
 import 'package:movies_starter_app/data/movies/model/list_response.dart';
 import 'package:movies_starter_app/data/movies/model/movie_item_response.dart';
 
-import 'model/movie_detail_response.dart';
+import '../model/movie_detail_response.dart';
 
 const String BASE_URL = 'https://api.themoviedb.org/3';
 const String IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';

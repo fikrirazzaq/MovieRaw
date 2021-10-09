@@ -1,6 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:sanf/presentation/reusable/network_image_loader.dart';
-import 'package:sanf/values/colors.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CollapsingAppBar extends StatefulWidget {
   final double expandedHeight;
@@ -9,6 +9,8 @@ class CollapsingAppBar extends StatefulWidget {
   final double paddingTopOfTitle;
   final String title;
   final String imageUrl;
+  final VoidCallback onFavoritePressed;
+  final bool isFavorite;
 
   const CollapsingAppBar({
     Key? key,
@@ -18,6 +20,8 @@ class CollapsingAppBar extends StatefulWidget {
     required this.paddingTopOfTitle,
     required this.title,
     required this.imageUrl,
+    required this.onFavoritePressed,
+    this.isFavorite = false,
   }) : super(key: key);
 
   @override
@@ -31,20 +35,30 @@ class _CollapsingAppBarState extends State<CollapsingAppBar> {
   Widget build(BuildContext context) {
     return SliverAppBar(
       brightness: Brightness.dark,
-      backgroundColor: colorPrimary,
       elevation: 0.0,
       expandedHeight: widget.expandedHeight,
       floating: false,
       title: _appBarTitle(),
       pinned: true,
+      actions: [
+        IconButton(
+          onPressed: widget.onFavoritePressed,
+          icon: FaIcon(
+            widget.isFavorite
+                ? FontAwesomeIcons.solidBookmark
+                : FontAwesomeIcons.bookmark,
+          ),
+        ),
+      ],
       flexibleSpace: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           _topConstraint = constraints.biggest.height;
           return Stack(
             children: [
               FlexibleSpaceBar(
-                background: ShowImageUrlWidget(
+                background: CachedNetworkImage(
                   imageUrl: widget.imageUrl,
+                  fit: BoxFit.cover,
                 ),
               ),
               Visibility(
@@ -61,7 +75,6 @@ class _CollapsingAppBarState extends State<CollapsingAppBar> {
                     ),
                   ),
                 ),
-                /**if top constraint > (status bar height + toolbar height)*/
                 visible: (_topConstraint >
                     MediaQuery.of(context).padding.top + kToolbarHeight),
               ),
@@ -76,7 +89,6 @@ class _CollapsingAppBarState extends State<CollapsingAppBar> {
     return ValueListenableBuilder(
       valueListenable: widget.collapsingAppBarNotifier,
       builder: (BuildContext context, double value, Widget? child) {
-        /**if collapsingOffset > (image height - toolbar height)*/
         if (value >= widget.scrollDistance) {
           return Text(
             widget.title,

@@ -17,55 +17,28 @@ class MovieItemAdapter extends TypeAdapter<MovieItem> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return MovieItem(
-      adult: fields[0] as bool?,
-      backdropPath: fields[1] as String?,
-      genreIds: (fields[2] as List?)?.cast<int?>(),
-      id: fields[3] as int?,
-      originalLanguage: fields[4] as String?,
-      originalTitle: fields[5] as String?,
-      overview: fields[6] as String?,
-      popularity: fields[7] as double?,
-      posterPath: fields[8] as String?,
-      releaseDate: fields[9] as String?,
-      title: fields[10] as String?,
-      video: fields[11] as bool?,
-      voteAverage: fields[12] as double?,
-      voteCount: fields[13] as int?,
+      id: fields[0] as int,
+      image: fields[1] as String,
+      title: fields[2] as String,
+      rating: fields[3] as double,
+      releaseDate: fields[4] as DateTime?,
     );
   }
 
   @override
   void write(BinaryWriter writer, MovieItem obj) {
     writer
-      ..writeByte(14)
-      ..writeByte(0)
-      ..write(obj.adult)
-      ..writeByte(1)
-      ..write(obj.backdropPath)
-      ..writeByte(2)
-      ..write(obj.genreIds)
-      ..writeByte(3)
-      ..write(obj.id)
-      ..writeByte(4)
-      ..write(obj.originalLanguage)
       ..writeByte(5)
-      ..write(obj.originalTitle)
-      ..writeByte(6)
-      ..write(obj.overview)
-      ..writeByte(7)
-      ..write(obj.popularity)
-      ..writeByte(8)
-      ..write(obj.posterPath)
-      ..writeByte(9)
-      ..write(obj.releaseDate)
-      ..writeByte(10)
+      ..writeByte(0)
+      ..write(obj.id)
+      ..writeByte(1)
+      ..write(obj.image)
+      ..writeByte(2)
       ..write(obj.title)
-      ..writeByte(11)
-      ..write(obj.video)
-      ..writeByte(12)
-      ..write(obj.voteAverage)
-      ..writeByte(13)
-      ..write(obj.voteCount);
+      ..writeByte(3)
+      ..write(obj.rating)
+      ..writeByte(4)
+      ..write(obj.releaseDate);
   }
 
   @override

@@ -1,28 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:movies_starter_app/data/movies/remote/movie_remote_data_source.dart';
+import 'package:movies_starter_app/ui/_model/movie_item.dart';
 
-import '../../../data/movies/model/movie_item_response.dart';
-import '../../../data/movies/movie_api_client.dart';
 import '../../now_playing_movies/now_playing_movies_screen.dart';
-import 'popular_movie_horizontal_listview_widget.dart';
+import 'now_playing_movie_listview_widget.dart';
 
 class NowPlayingMoviesSectionWidget extends StatefulWidget {
   const NowPlayingMoviesSectionWidget({Key? key}) : super(key: key);
 
   @override
-  _NowPlayingMoviesSectionWidgetState createState() => _NowPlayingMoviesSectionWidgetState();
+  _NowPlayingMoviesSectionWidgetState createState() =>
+      _NowPlayingMoviesSectionWidgetState();
 }
 
-class _NowPlayingMoviesSectionWidgetState extends State<NowPlayingMoviesSectionWidget> {
-  MovieApiClient _movieApiClient = MovieApiClient();
+class _NowPlayingMoviesSectionWidgetState
+    extends State<NowPlayingMoviesSectionWidget> {
+  MoviesRemoteDataSource _remoteDataSource = MoviesRemoteDataSourceImpl();
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<MovieItemResponse>?>(
-      future: _movieApiClient.getNowPlayingMovies(),
-      builder: (context, AsyncSnapshot<List<MovieItemResponse>?> snapshot) {
+    return FutureBuilder<List<MovieItem>?>(
+      future: _remoteDataSource.listNowPlayingMovies(),
+      builder: (context, AsyncSnapshot<List<MovieItem>?> snapshot) {
         if (snapshot.hasData) {
           if (snapshot.data != null) {
-            List<MovieItemResponse> movies = snapshot.data!;
+            List<MovieItem> movieItems = snapshot.data!;
 
             return Column(
               children: [
@@ -47,7 +49,7 @@ class _NowPlayingMoviesSectionWidgetState extends State<NowPlayingMoviesSectionW
                     ),
                   ],
                 ),
-                PopularMovieHorizontalListViewWidget(movieItems: movies),
+                NowPlayingMovieListViewWidget(movieItems: movieItems),
               ],
             );
           } else {

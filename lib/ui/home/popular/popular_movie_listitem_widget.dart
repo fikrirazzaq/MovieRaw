@@ -1,15 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:movies_starter_app/data/movies/model/movie_item_response.dart';
-import 'package:movies_starter_app/data/movies/movie_api_client.dart';
+import 'package:movies_starter_app/data/movies/remote/movie_api_client.dart';
 
-class PopularMovieHorizontalListItemWidget extends StatelessWidget {
+class PopularMovieListItemWidget extends StatelessWidget {
   final VoidCallback onTap;
-  final MovieItemResponse movieItemResponse;
+  final MovieItemResponse movie;
 
-  const PopularMovieHorizontalListItemWidget({
+  const PopularMovieListItemWidget({
     Key? key,
-    required this.movieItemResponse,
+    required this.movie,
     required this.onTap,
   }) : super(key: key);
 
@@ -25,7 +25,7 @@ class PopularMovieHorizontalListItemWidget extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.all(Radius.circular(8)),
           child: CachedNetworkImage(
-            imageUrl: '$IMAGE_BASE_URL${movieItemResponse.posterPath}',
+            imageUrl: '$IMAGE_BASE_URL${movie.posterPath}',
             width: 120,
             fit: BoxFit.cover,
           ),

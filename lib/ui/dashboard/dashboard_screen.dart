@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:movies_starter_app/ui/favorite/favorite_movies_screen.dart';
 import 'package:movies_starter_app/ui/home/home_screen.dart';
 import 'package:movies_starter_app/values/colors.dart';
 import 'package:movies_starter_app/values/styles.dart';
@@ -17,7 +19,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<Widget> _dashboardBodyWidgets = <Widget>[
     HomeScreen(),
     Placeholder(color: Colors.red),
-    Placeholder(color: Colors.blue),
+    FavoriteMoviesScreen(),
     Placeholder(color: Colors.green),
   ];
 
@@ -29,7 +31,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: _dashboardBodyWidgets,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.white,
         type: BottomNavigationBarType.fixed,
         items: _mainMenuItems(),
         currentIndex: _selectedIndexBody,
@@ -38,38 +39,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _selectedIndexBody = index;
           });
         },
-        selectedLabelStyle: selectedMainMenuStyle,
-        unselectedLabelStyle: unselectedMainMenuStyle,
+        showUnselectedLabels: false,
+        showSelectedLabels: false,
       ),
     );
   }
 
   List<BottomNavigationBarItem> _mainMenuItems() {
     return <BottomNavigationBarItem>[
-      _mainMenuItemWidget('Home', Icons.home),
-      _mainMenuItemWidget('Search', Icons.search),
-      _mainMenuItemWidget('Favorite', Icons.favorite),
-      _mainMenuItemWidget('Profile', Icons.person),
+      _mainMenuItemWidget('Home', FontAwesomeIcons.home),
+      _mainMenuItemWidget('Search', FontAwesomeIcons.search),
+      _mainMenuItemWidget('Favorite', FontAwesomeIcons.bookmark),
+      _mainMenuItemWidget('Profile', FontAwesomeIcons.user),
     ];
   }
 
   BottomNavigationBarItem _mainMenuItemWidget(
       String menuTitle, IconData iconData) {
     return BottomNavigationBarItem(
-      activeIcon: Padding(
-        padding: EdgeInsets.only(top: 14.0, bottom: 14.0),
-        child: Icon(
-          iconData,
-          color: colorSecondary,
-        ),
-      ),
-      icon: Padding(
-        padding: EdgeInsets.only(top: 14.0, bottom: 14.0),
-        child: Icon(
-          iconData,
-          color: colorGreyLight,
-        ),
-      ),
+      activeIcon: Icon(iconData),
+      icon: FaIcon(iconData),
       label: menuTitle,
     );
   }
