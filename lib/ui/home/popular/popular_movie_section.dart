@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movies_starter_app/bloc/bloc/movie_bloc.dart';
 
-import '../../../data/movies/model/movie_item_response.dart';
-import '../../../data/movies/remote/movie_api_client.dart';
 import '../../popular_movies/popular_movies_screen.dart';
 import 'popular_movie_listview_widget.dart';
 
@@ -15,46 +15,58 @@ class PopularMoviesSectionWidget extends StatefulWidget {
 
 class _PopularMoviesSectionWidgetState
     extends State<PopularMoviesSectionWidget> {
-  MovieApiClient _movieApiClient = MovieApiClient();
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<MovieBloc>().add(GetPopularMoviesEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<MovieItemResponse>?>(
-      future: _movieApiClient.getPopularMovies(),
-      builder: (context, AsyncSnapshot<List<MovieItemResponse>?> snapshot) {
-        if (snapshot.hasData) {
-          if (snapshot.data != null) {
-            List<MovieItemResponse> movies = snapshot.data!;
-
-            return Column(
-              children: [
-                Row(
-                  children: [
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        'Popular Today',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+    return BlocBuilder<MovieBloc, MovieState>(
+      buildWhen: (prevState, nextState) {
+        return nextState is GetPopularMoviesLoaded ||
+            nextState is GetPopularMoviesError ||
+            nextState is GetPopularMoviesLoading;
+      },
+      builder: (context, state) {
+        if (state is GetPopularMoviesLoaded) {
+          return Column(
+            children: [
+              Row(
+                children: [
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      'Popular Today',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(
-                            context, PopularMoviesScreen.routeName);
-                      },
-                      child: Text('See All'),
-                    ),
-                  ],
-                ),
-                PopularMovieListViewWidget(movieItems: movies),
-              ],
-            );
-          } else {
-            return Text('Error');
-          }
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(
+                          context, PopularMoviesScreen.routeName);
+                    },
+                    child: Text('See All'),
+                  ),
+                ],
+              ),
+              PopularMovieListViewWidget(movieItems: state.movies),
+            ],
+          );
+        }
+
+        if (state is GetPopularMoviesError) {
+          return Column(
+            children: [
+              Text(state.message),
+              IconButton(onPressed: () {}, icon: Icon(Icons.refresh))
+            ],
+          );
         }
 
         return CircularProgressIndicator();

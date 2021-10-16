@@ -28,6 +28,7 @@ class MoviesLocalDataSourceImpl implements MoviesLocalDataSource {
 
   @override
   void deleteFromFavorite(String key) {
+    print('DELETE: KEY: ${key}');
     hiveDb.delete<MovieItem>(boxName: BOXNAME_FAVORITE_MOVIES, key: key);
   }
 

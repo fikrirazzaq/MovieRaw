@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:movies_starter_app/bloc/cubit/bottom_nav_cubit.dart';
 import 'package:movies_starter_app/ui/favorite/favorite_movies_screen.dart';
 import 'package:movies_starter_app/ui/home/home_screen.dart';
-import 'package:movies_starter_app/values/colors.dart';
-import 'package:movies_starter_app/values/styles.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -14,8 +14,6 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int _selectedIndexBody = 0;
-
   List<Widget> _dashboardBodyWidgets = <Widget>[
     HomeScreen(),
     Placeholder(color: Colors.red),
@@ -25,23 +23,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndexBody,
-        children: _dashboardBodyWidgets,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: _mainMenuItems(),
-        currentIndex: _selectedIndexBody,
-        onTap: (index) {
-          setState(() {
-            _selectedIndexBody = index;
-          });
-        },
-        showUnselectedLabels: false,
-        showSelectedLabels: false,
-      ),
+    return BlocBuilder<BottomNavCubit, BottomNavState>(
+      builder: (context, state) {
+        return Scaffold(
+          body: _dashboardBodyWidgets[state.selectedIndexBody],
+          bottomNavigationBar: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            items: _mainMenuItems(),
+            currentIndex: state.selectedIndexBody,
+            onTap: (index) {
+              context.read<BottomNavCubit>().navigateTo(index);
+            },
+            showUnselectedLabels: false,
+            showSelectedLabels: false,
+          ),
+        );
+      },
     );
   }
 

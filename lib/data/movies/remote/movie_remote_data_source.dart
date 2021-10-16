@@ -19,18 +19,11 @@ class MoviesRemoteDataSourceImpl implements MoviesRemoteDataSource {
   MovieApiClient apiClient = MovieApiClient();
 
   @override
-  Future<MovieDetail> detailMovie(String id) async {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<List<MovieItem>?> listNowPlayingMovies() async {
+  Future<MovieDetail?> detailMovie(String id) async {
     try {
-      List<MovieItemResponse>? responses = await apiClient.getPopularMovies();
-      if (responses != null) {
-        return responses
-            .map((e) => MovieItem.fromMovieItemResponse(e))
-            .toList();
+      MovieDetailResponse? response = await apiClient.getMovieDetail(id);
+      if (response != null) {
+        return MovieDetail.fromMovieDetailResponse(response);
       }
     } catch (error) {
       print('Error: detailMovie => $error');
@@ -40,13 +33,40 @@ class MoviesRemoteDataSourceImpl implements MoviesRemoteDataSource {
   }
 
   @override
-  Future<List<MovieItem>> listPopularMovies() {
-    // TODO: implement listPopularMovies
-    throw UnimplementedError();
+  Future<List<MovieItem>?> listNowPlayingMovies() async {
+    try {
+      List<MovieItemResponse>? responses =
+          await apiClient.getNowPlayingMovies();
+      if (responses != null) {
+        return responses
+            .map((e) => MovieItem.fromMovieItemResponse(e))
+            .toList();
+      }
+    } catch (error) {
+      print('Error: listNowPlayingMovies => $error');
+    }
+
+    return null;
   }
 
   @override
-  Future<List<MovieItem>> listSearchMovies({required String keyword}) {
+  Future<List<MovieItem>?> listPopularMovies() async {
+    try {
+      List<MovieItemResponse>? responses = await apiClient.getPopularMovies();
+      if (responses != null) {
+        return responses
+            .map((e) => MovieItem.fromMovieItemResponse(e))
+            .toList();
+      }
+    } catch (error) {
+      print('Error: listPopularMovies => $error');
+    }
+
+    return null;
+  }
+
+  @override
+  Future<List<MovieItem>?> listSearchMovies({required String keyword}) async {
     // TODO: implement listSearchMovies
     throw UnimplementedError();
   }

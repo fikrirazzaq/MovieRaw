@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:movies_starter_app/data/movies/local/movies_local_data_source.dart';
-import 'package:movies_starter_app/ui/_model/movie_item.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movies_starter_app/bloc/bloc/movie_bloc.dart';
 import 'package:movies_starter_app/ui/_reusable/movie_gridview_widget.dart';
 
 class FavoriteMoviesScreen extends StatefulWidget {
@@ -12,15 +11,11 @@ class FavoriteMoviesScreen extends StatefulWidget {
 }
 
 class _FavoriteMoviesScreenState extends State<FavoriteMoviesScreen> {
-  final MoviesLocalDataSource moviesLocalDataSource =
-      MoviesLocalDataSourceImpl();
-
-  // List<MovieItem> movies = [];
   @override
   void initState() {
     super.initState();
 
-    // movies = moviesLocalDataSource.listFavorite();
+    context.read<MovieBloc>().add(GetFavoriteMoviesEvent());
   }
 
   @override
@@ -29,14 +24,29 @@ class _FavoriteMoviesScreenState extends State<FavoriteMoviesScreen> {
       appBar: AppBar(
         title: Text('Favorites'),
       ),
-      body: ValueListenableBuilder<Box<MovieItem>>(
-        valueListenable: moviesLocalDataSource.listenable(),
-        builder: (context, box, child) {
-          List<MovieItem> movies = box.values.toList();
+      body: BlocBuilder<MovieBloc, MovieState>(
+        buildWhen: (prevState, nextState) {
+          return nextState is GetFavoriteMoviesLoaded ||
+              nextState is GetFavoriteMoviesError ||
+              nextState is GetFavoriteMoviesLoading;
+        },
+        builder: (context, state) {
+          if (state is GetFavoriteMoviesLoaded) {
+            return MovieGridViewWidget(
+              movie: state.movies,
+            );
+          }
 
-          return MovieGridViewWidget(
-            movie: movies,
-          );
+          if (state is GetFavoriteMoviesError) {
+            return Column(
+              children: [
+                Text(state.message),
+                IconButton(onPressed: () {}, icon: Icon(Icons.refresh)),
+              ],
+            );
+          }
+
+          return CircularProgressIndicator();
         },
       ),
     );

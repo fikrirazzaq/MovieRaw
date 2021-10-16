@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hive/hive.dart';
+import 'package:movies_starter_app/bloc/bloc/movie_bloc.dart';
 import 'package:movies_starter_app/data/movies/local/movies_local_data_source.dart';
-import 'package:movies_starter_app/data/movies/model/movie_detail_response.dart';
 import 'package:movies_starter_app/data/movies/remote/movie_api_client.dart';
+import 'package:movies_starter_app/ui/_model/movie_detail.dart';
 import 'package:movies_starter_app/ui/_model/movie_item.dart';
 import 'package:movies_starter_app/ui/_reusable/sliver/sliver_view_widget.dart';
 
@@ -18,47 +21,59 @@ class MovieDetailBody extends StatefulWidget {
 }
 
 class _MovieDetailBodyState extends State<MovieDetailBody> {
-  MovieApiClient _movieApiClient = MovieApiClient();
-  MoviesLocalDataSource moviesLocalDataSource = MoviesLocalDataSourceImpl();
+  List<int> favoritedIds = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    context
+        .read<MovieBloc>()
+        .add(GetMovieDetailEvent(id: widget.movieId.toString()));
+
+    context.read<MovieBloc>().add(GetFavoriteMoviesEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<MovieDetailResponse?>(
-      future: _movieApiClient.getMovieDetail(widget.movieId.toString()),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          if (snapshot.data != null) {
-            MovieDetailResponse movie = snapshot.data!;
+    return BlocConsumer<MovieBloc, MovieState>(
+      listenWhen: listenWhen,
+      listener: listener,
+      buildWhen: (prevState, nextState) =>
+          nextState is GetMovieDetailLoaded ||
+          nextState is GetMovieDetailError ||
+          nextState is GetMovieDetailLoading,
+      builder: (context, state) {
+        if (state is GetMovieDetailLoaded) {
+          MovieDetail movie = state.movie;
 
-            return ValueListenableBuilder<Box<MovieItem>>(
-              valueListenable: moviesLocalDataSource.listenable(),
-              builder: (context, box, child) {
-                List<int> favoritedIds = box.values.map((e) => e.id).toList();
-                bool isFavorite = favoritedIds.contains(movie.id);
+          bool isFavorite = favoritedIds.contains(movie.id);
 
-                return SliverViewWidget(
-                  title: movie.title ?? '',
-                  imageUrl: '$IMAGE_BASE_URL${movie.posterPath}',
-                  body: _buildBody(movie),
-                  onFavoritePressed: () {
-                    if (isFavorite) {
-                      moviesLocalDataSource.deleteFromFavorite(
-                        movie.id.toString(),
-                      );
-                    } else {
-                      moviesLocalDataSource.putToFavorite(
-                        movie.id.toString(),
-                        MovieItem.fromMovieDetailResponse(movie),
-                      );
-                    }
-                  },
-                  isFavorite: isFavorite,
-                );
-              },
-            );
-          } else {
-            return Text('Data movie not found.');
-          }
+          return SliverViewWidget(
+            title: movie.title,
+            imageUrl: "$IMAGE_BASE_URL${movie.posterPath}",
+            body: _buildBody(movie),
+            onFavoritePressed: () {
+              if (isFavorite) {
+                context
+                    .read<MovieBloc>()
+                    .add(RemoveMovieFromFavoriteEvent(id: movie.id.toString()));
+              } else {
+                context.read<MovieBloc>().add(AddMovieToFavoriteEvent(
+                    movieItem: MovieItem.fromMovieDetail(movie)));
+              }
+            },
+            isFavorite: isFavorite,
+          );
+        }
+
+        if (state is GetMovieDetailError) {
+          return Column(
+            children: [
+              Text(state.message),
+              IconButton(onPressed: () {}, icon: Icon(Icons.refresh)),
+            ],
+          );
         }
 
         return CircularProgressIndicator();
@@ -66,7 +81,39 @@ class _MovieDetailBodyState extends State<MovieDetailBody> {
     );
   }
 
-  Column _buildBody(MovieDetailResponse movie) {
+  bool listenWhen(MovieState prevState, MovieState nextState) =>
+      nextState is AddMovieToFavoriteError ||
+      nextState is RemoveMovieFromFavoriteError ||
+      nextState is AddMovieToFavoriteSuccess ||
+      nextState is RemoveMovieFromFavoriteSuccess ||
+      nextState is GetFavoriteMoviesLoaded;
+
+  void listener(BuildContext context, MovieState state) {
+    if (state is AddMovieToFavoriteError) {
+      Fluttertoast.showToast(msg: 'Failed to Add Favorite');
+    }
+    if (state is RemoveMovieFromFavoriteError) {
+      Fluttertoast.showToast(msg: 'Failed to Remove Favorite');
+    }
+
+    if (state is AddMovieToFavoriteSuccess) {
+      Fluttertoast.showToast(msg: 'Success Add to Favorite');
+      context.read<MovieBloc>().add(GetFavoriteMoviesEvent());
+    }
+
+    if (state is RemoveMovieFromFavoriteSuccess) {
+      Fluttertoast.showToast(msg: 'Success Remove from Favorite');
+      context.read<MovieBloc>().add(GetFavoriteMoviesEvent());
+    }
+
+    if (state is GetFavoriteMoviesLoaded) {
+      setState(() {
+        favoritedIds = state.movies.map((e) => e.id).toList();
+      });
+    }
+  }
+
+  Column _buildBody(MovieDetail movie) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -108,10 +155,7 @@ class _MovieDetailBodyState extends State<MovieDetailBody> {
         Wrap(
           spacing: 8,
           runSpacing: 6,
-          children: movie.genres
-                  ?.map((e) => Chip(label: Text(e.name ?? '')))
-                  .toList() ??
-              [],
+          children: movie.genres.map((e) => Chip(label: Text(e.name))).toList(),
         ),
         SizedBox(height: 16),
         Text(
@@ -126,18 +170,17 @@ class _MovieDetailBodyState extends State<MovieDetailBody> {
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: movie.productionCompanies
-                    ?.map(
-                      (e) => CachedNetworkImage(
-                        imageUrl: "$IMAGE_BASE_URL${e.logoPath}",
-                        height: 54,
-                      ),
-                    )
-                    .toList() ??
-                [],
+                .map(
+                  (e) => CachedNetworkImage(
+                    imageUrl: "$IMAGE_BASE_URL${e.logoPath}",
+                    height: 54,
+                  ),
+                )
+                .toList(),
           ),
         ),
         Text(
-          '${movie.productionCompanies?.map((e) => e.name)}',
+          '${movie.productionCompanies.map((e) => e.name)}',
           style: TextStyle(
             fontSize: 14,
           ),

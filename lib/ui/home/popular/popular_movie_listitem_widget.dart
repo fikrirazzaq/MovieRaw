@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:movies_starter_app/data/movies/model/movie_item_response.dart';
 import 'package:movies_starter_app/data/movies/remote/movie_api_client.dart';
+import 'package:movies_starter_app/ui/_model/movie_item.dart';
 
 class PopularMovieListItemWidget extends StatelessWidget {
   final VoidCallback onTap;
-  final MovieItemResponse movie;
+  final MovieItem movie;
 
   const PopularMovieListItemWidget({
     Key? key,
@@ -25,7 +25,7 @@ class PopularMovieListItemWidget extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.all(Radius.circular(8)),
           child: CachedNetworkImage(
-            imageUrl: '$IMAGE_BASE_URL${movie.posterPath}',
+            imageUrl: '$IMAGE_BASE_URL${movie.image}',
             width: 120,
             fit: BoxFit.cover,
           ),

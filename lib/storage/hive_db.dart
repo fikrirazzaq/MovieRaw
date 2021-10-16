@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:movies_starter_app/ui/_model/movie_item.dart';
 
-const String BOXNAME_FAVORITE_MOVIES = 'Carrot';
+const String BOXNAME_FAVORITE_MOVIES = 'Bala-Bala';
 
 class HiveDb {
   Future<void> initHiveDatabase() async {
